@@ -14,13 +14,14 @@ class VKStrategy extends OpauthStrategy {
     /**
      * Optional config keys, without predefining any default values.
      */
-    public $optionals = array('redirect_uri', 'scope', 'response_type', 'v', 'state', 'display');
+    public $optionals = array('redirect_uri', 'scope', 'response_type', 'v', 'state', 'display', 'revoke');
 
     /**
      * Optional config keys with respective default values, listed as associative arrays
      * eg. array('scope' => 'email');
      */
     public $defaults = array(
+        'revoke' => 1,
         'v' => '5.65',
         'redirect_uri' => '{complete_url_to_strategy}oauth2callback',
         'scope' => 'email',
@@ -73,6 +74,7 @@ class VKStrategy extends OpauthStrategy {
                     'uid' => $profile['uid'],
                     'info' => array(
                         'name' => sprintf('%s %s', $profile['first_name'], $profile['last_name']),
+                        'nickname' => $profile['screen_name'],
                         'email' => isset($results->email) ? $results->email : '',
                         'urls' => array(
                             'vk' => str_replace('{domain}', $profile['domain'], $this->strategy['vk_profile_url'])
@@ -87,7 +89,6 @@ class VKStrategy extends OpauthStrategy {
 
                 $this->mapProfile($profile, 'first_name', 'info.first_name');
                 $this->mapProfile($profile, 'last_name', 'info.last_name');
-                $this->mapProfile($profile, 'screen_name', 'info.nickname');
                 $this->mapProfile($profile, 'photo_100', 'info.image');
 
                 $this->callback();
