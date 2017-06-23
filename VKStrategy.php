@@ -21,7 +21,7 @@ class VKStrategy extends OpauthStrategy {
      * eg. array('scope' => 'email');
      */
     public $defaults = array(
-        'revoke' => 1,
+        'revoke' => 0,
         'v' => '5.65',
         'redirect_uri' => '{complete_url_to_strategy}oauth2callback',
         'scope' => 'email',
