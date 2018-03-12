@@ -47,7 +47,7 @@ class VKStrategy extends OpauthStrategy {
 
         $this->clientGet($url, $params);
     }
-    
+
     /**
      * Internal callback to get the code and request que authorization token, after VK's OAuth
      */
@@ -57,6 +57,7 @@ class VKStrategy extends OpauthStrategy {
             $url = 'https://oauth.vk.com/access_token';
 
             $params = array(
+                'v' => $this->strategy['v'],
                 'code' => $code,
                 'client_id' =>$this->strategy['app_id'],
                 'client_secret' => $this->strategy['app_secret'],
@@ -71,7 +72,7 @@ class VKStrategy extends OpauthStrategy {
                 $profile = $profileResponse['response'][0];
 
                 $this->auth = array(
-                    'uid' => $profile['uid'],
+                    'uid' => $profile['id'],
                     'info' => array(
                         'name' => sprintf('%s %s', $profile['first_name'], $profile['last_name']),
                         'nickname' => $profile['screen_name'],
@@ -113,10 +114,10 @@ class VKStrategy extends OpauthStrategy {
             $this->errorCallback($error);
         }
     }
-    
-    private function getProfile($access_token, $uid) {
+
+    private function getProfile($access_token, $id) {
         if (empty($this->strategy['profile_fields'])) {
-            $this->strategy['profile_fields'] = array('uid', 'first_name', 'last_name', 'screen_name', 'domain', 'photo_100');
+            $this->strategy['profile_fields'] = array('id', 'first_name', 'last_name', 'screen_name', 'domain', 'photo_100');
         }
 
         if (is_array($this->strategy['profile_fields'])) {
@@ -125,7 +126,11 @@ class VKStrategy extends OpauthStrategy {
             $fields = $this->strategy['profile_fields'];
         }
 
-        $userinfo = $this->serverGet('https://api.vk.com/method/users.get', array('access_token' => $access_token, 'fields' => $fields));
+        $userinfo = $this->serverGet('https://api.vk.com/method/users.get', array(
+            'v' => $this->strategy['v'],
+            'access_token' => $access_token,
+            'fields' => $fields
+        ));
 
         if (!empty($userinfo)) {
             return json_decode($userinfo, true);
